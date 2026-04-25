@@ -1044,7 +1044,349 @@ TO PAY:                  ₹1,189.82
 
 ---
 
-## 24. COMPETITIVE DIFFERENTIATORS (What Makes Zomato Unique)
+## 24. UI/UX DEEP DIVE — SCREEN-BY-SCREEN ANALYSIS
+
+### 24.1 Onboarding Flow (Verified — 40% Activation Rate)
+
+**Entry Points:**
+- Phone number + OTP (primary)
+- Google/Facebook social login
+
+**Flow:**
+```
+App Launch
+    ↓
+Location Permission Request
+    ↓
+Phone Number Input
+    ↓
+OTP Auto-fill (or manual entry)
+    ↓
+Home Screen (immediate — no profile setup required)
+```
+
+**Key UX Decisions:**
+- **No mandatory profile setup:** Users land on home screen immediately after OTP
+- **Language selection:** Available but poorly positioned (user feedback indicates it's hard to find during signup)
+- **Progressive disclosure:** Address, preferences collected later during first order
+- **Social graph:** Option to sync contacts for "Recommended by Friends" feature
+
+**Pain Point Identified:**
+- Language switcher during signup is not prominent enough
+- Only 0.02% of Indians consider English their first language; 90% prefer local language content
+
+### 24.2 Home Screen Interaction Details
+
+**Scroll Behavior:**
+- Vertical infinite scroll for restaurant list
+- Horizontal swipe for cuisine rails, offer banners, category chips
+- Pull-to-refresh reloads restaurant list
+
+**Sticky Elements:**
+- Search bar becomes compact on scroll
+- Category filter rail sticks below search bar
+- Delivery/Dining toggle may stick depending on scroll position
+
+**Card Interactions:**
+- Tap card → Restaurant detail page
+- Long press (experimental) → Quick preview
+- Swipe left (on some versions) → "Hide" restaurant
+
+**"Hide" Feature:**
+- Allows users to remove unwanted restaurants from feed
+- Prominent "Undo" button appears after hide action
+- No pre-action explanation of what "hide" does — could be improved
+
+### 24.3 Restaurant Detail Page — Scroll Behavior
+
+**Sticky Header Pattern:**
+```
+[Hero Image] ← Fades out, parallax effect on scroll
+    ↓
+[Restaurant Name + Rating] ← Sticky mini-header appears
+    ↓
+[Offer Carousel] ← Horizontal scroll
+    ↓
+[Info Bar] ← Sticky below header
+    ↓
+[Menu Search Bar] ← Sticky, filters menu items in real-time
+    ↓
+[Category Tabs] ← Sticky, auto-highlight on scroll
+    ↓
+[Menu Sections] ← Vertical scroll, collapsible headers
+```
+
+**Category Tab Auto-Highlight:**
+- As user scrolls through menu, active category tab updates automatically
+- Tapping a tab scrolls menu to that section
+- Visual indicator: underlined/active state on current category
+
+**Restaurant Info Modal:**
+- Tapping info icon beside restaurant name opens full details
+- Shows: operational since, FSSAI certification, GST, full address, hours
+- Builds trust through transparency
+
+### 24.4 Menu Item Interactions
+
+**Add to Cart Flow:**
+```
+Tap "+" / "Add"
+    ↓
+If no customizations:
+    Button morphs into quantity stepper [- 1 +]
+    Brief scale animation on button
+    Cart badge updates with bounce animation
+    
+If customizations exist:
+    Bottom sheet slides up
+    User selects options
+    Tap "Add Item" → Sheet dismisses with slide-down animation
+    Button morphs to stepper
+```
+
+**Quantity Stepper Behavior:**
+- Tap "+" → Quantity increments with subtle pulse animation
+- Tap "-" → Quantity decrements; if reaches 0, reverts to "Add" button
+- Max quantity limit may apply for some items
+
+**Menu Item Image:**
+- Tap image → Full-screen image viewer with pinch-to-zoom
+- Swipe between multiple images if available
+- Back gesture dismisses viewer
+
+### 24.5 Cart Page Interactions
+
+**Cart Organization:**
+- Items grouped by restaurant
+- Each group collapsible/expandable
+- Restaurant name acts as section header
+
+**Item Actions:**
+- Quantity stepper per item
+- Remove (×) button on each item
+- Customization summary shown below item name
+
+**Bill Breakup Interaction:**
+- Tap "Bill Details" → Expands accordion showing full cost breakdown
+- Tap again → Collapses
+- Savings highlighted in green
+
+**Coupon Application:**
+- Tap "Apply Coupon" → Bottom sheet with available coupons
+- Each coupon shows: code, description, savings amount
+- Tap coupon → Auto-applies, sheet dismisses
+- Invalid coupon → Error toast with shake animation on input field
+
+### 24.6 Checkout Flow Interactions
+
+**Address Selection:**
+- Saved addresses shown as selectable cards
+- "Add New Address" → Map screen with draggable pin
+- Address validation: checks delivery zone coverage
+
+**Payment Method Selection:**
+- Radio button list of saved methods
+- "Add New" options for each payment type
+- UPI apps shown as app icon grid (Google Pay, PhonePe, Paytm)
+
+**Order Placement:**
+- "Place Order" CTA → Loading spinner on button
+- Success → Order confirmation screen with celebration animation
+- Failure → Error message with retry option or alternative payment suggestion
+
+### 24.7 Order Tracking Screen Interactions
+
+**Map Interactions:**
+- Pinch to zoom
+- Pan to explore route
+- Tap rider icon → Rider details card
+- Real-time rider movement animation
+
+**Timeline Tapping:**
+- Tap any completed step → Shows timestamp
+- Tap current step → May show more details (e.g., "Food being prepared since 11:50")
+
+**Contact Options:**
+- "Call" button → Initiates masked phone call
+- "Chat" button → Opens in-app chat with delivery partner
+- "Cancel" option (if within cancellation window)
+
+### 24.8 Group Ordering Feature (Verified — Aug 2024)
+
+**Flow:**
+```
+User creates group order
+    ↓
+Shareable link generated
+    ↓
+Friends tap link → Opens Zomato (or web) with shared cart
+    ↓
+Each friend adds items to shared cart
+    ↓
+Host sees all items in real-time
+    ↓
+Host finalizes and places order
+    ↓
+All participants can track order
+```
+
+**UI Elements:**
+- "Create Group Order" button on cart page
+- Link sharing via WhatsApp, SMS, social apps
+- "Group Cart" badge showing number of participants
+- Per-person item indicators (who ordered what)
+- Host controls: finalize, remove items, cancel
+
+**Limitations:**
+- Up to 50 friends can join
+- Single restaurant per group order (multi-restaurant requested by users)
+- Payment splitting "coming soon" (as of Aug 2024)
+
+### 24.9 Order Scheduling Feature (Verified — Oct 2024)
+
+**UI Flow:**
+- On restaurant page: "Schedule" option next to "Order Now"
+- Date/time picker bottom sheet
+- Shows available time slots
+- Full slots marked as unavailable with visual indicator
+- Cancellation allowed up to 3 hours before scheduled delivery
+
+**Visual Indicators:**
+- Scheduled orders shown with calendar icon in order list
+- Countdown to delivery time on tracking screen
+
+### 24.10 Order Modification & Cancellation
+
+**Cancellation Window:**
+- **60-second instant cancellation:** Full refund, no questions
+- **Post-60 seconds:** Depends on restaurant preparation status
+- **After dispatch:** Cannot cancel
+
+**Cancellation UI:**
+- "Cancel Order" button on order details
+- Reason selection bottom sheet:
+  - Ordered by mistake
+  - Change of plans
+  - Found a better deal
+  - Other
+- Confirmation dialog with refund preview
+
+**Order Modification:**
+- Available only if restaurant hasn't started preparation
+- Contact restaurant through in-app chat
+- No direct UI for editing items post-placement (gap in UX)
+
+### 24.11 Empty States & Error Handling
+
+**Types of Empty States:**
+
+| Scenario | Design Pattern |
+|----------|--------------|
+| **No search results** | Illustration + "No results found" + suggested alternatives |
+| **Empty cart** | Illustration + "Your cart is empty" + "Browse Restaurants" CTA |
+| **No orders history** | Illustration + "No orders yet" + "Order Now" CTA |
+| **No internet** | Full-screen illustration + "Check connection" + "Retry" button |
+| **Restaurant closed** | Info card + "Opens at [time]" + pre-order option |
+| **Service unavailable** | Error illustration + apology message + support contact |
+
+**Error Handling:**
+- **Network errors:** Skeleton screens with retry button
+- **Payment failure:** Inline error with alternative payment suggestion
+- **Restaurant rejection:** Toast notification + automatic refund
+- **Item unavailable:** Strike-through in cart + "Remove" suggestion
+
+### 24.12 Notification Design (Verified — Conversational Tone)
+
+**Zomato's notification strategy:** Uses casual, humorous, conversational tone that feels like a friend texting.
+
+**Examples:**
+- "Your biryani is being prepared. The chef is being extra careful with the spices 🌶️"
+- "Rahul is on his way with your order. He's riding faster than your ex's rebound 🏍️"
+- "Food delivered. Time to Netflix and actually chill 🍕📺"
+
+**Design Principles:**
+- **Personal:** Taps into emotions, humor, nostalgia
+- **Memorable:** Quirky messaging stands out
+- **Action-driving:** Cleverly weaves offers or reminders
+
+### 24.13 Microinteractions & Animations
+
+**Verified Animation Patterns:**
+
+| Interaction | Animation | Duration |
+|-------------|-----------|----------|
+| **Button tap** | Scale down to 0.95, spring back | 100-200ms |
+| **Add to cart** | Button morph to stepper + cart badge bounce | 200-300ms |
+| **Bottom sheet** | Slide up from bottom with slight bounce | 250-350ms |
+| **Dismiss** | Slide down or swipe away | 200ms |
+| **Loading** | Skeleton shimmer (light gray to white gradient) | 800ms loop |
+| **Pull-to-refresh** | Rotate arrow → skeleton → content fade-in | 400ms |
+| **Image loading** | Progressive blur-to-sharp | Varies |
+| **Screen transition** | Push from right (iOS), slide up (Android) | 300ms |
+| **Toast notification** | Slide in from top, auto-dismiss | 3s display |
+| **Error shake** | Horizontal shake on invalid input | 300ms |
+
+**Skeleton Loading Pattern:**
+- Shimmer effect with light gray to white gradient
+- Matches shape of actual content (restaurant cards, menu items)
+- Reduces perceived loading time
+- Crossfade to real content when loaded
+
+### 24.14 Accessibility Features
+
+- **Dietary indicators:** Color + shape (not color-only)
+  - Green circle = Veg
+  - Red triangle = Non-Veg
+  - Brown square = Egg
+- **Alt text:** All images have descriptive alt text
+- **Screen reader optimized:** Card layouts with proper semantic structure
+- **High contrast mode:** Supported
+- **Font scaling:** Respects system font size settings
+- **Reduced motion:** Respects system animation preferences
+
+### 24.15 Trust-First Design Pattern (India-Specific)
+
+Zomato's UI follows India's "trust-first" design pattern:
+
+```css
+.interface {
+  trust-signals: prominent;
+  explanations: detailed;
+  language: hyper-localized;
+  style: "trust-first";
+}
+```
+
+**Implementation:**
+- **FSSAI license numbers** displayed prominently
+- **Hygiene badges** visible on restaurant cards
+- **GST compliance** shown in restaurant info
+- **Photo reviews** from real users (not just ratings)
+- **Detailed bill breakup** (no hidden charges)
+- **COD option** for payment-averse users
+- **Order cancellation policy** clearly stated
+
+### 24.16 Social Nudges & Behavioral Design
+
+**"Recommended by Friends":**
+- Shows restaurants ordered by contacts
+- Privacy controls for what users share
+- Leverages social proof without being pushy
+
+**AI Match Scores:**
+- Replaces generic ratings with personalized match percentage
+- Factors: order history, preferred price range, cuisine choices, time of day
+- High-match options placed at top of list
+- Reduces scroll fatigue and decision time
+
+**Default Nudges:**
+- Default tab is "Delivery" (most common use case)
+- Default sort is "Relevance" (personalized)
+- Default donation to Feeding India is opt-out (pre-checked)
+
+---
+
+## 25. COMPETITIVE DIFFERENTIATORS (What Makes Zomato Unique)
 
 1. **Dine-in Discovery:** Unlike pure delivery apps, Zomato retains the original restaurant discovery DNA
 2. **Menu Density:** Even small-town restaurants have complete menus with descriptions
@@ -1055,10 +1397,13 @@ TO PAY:                  ₹1,189.82
 7. **Live Activities:** iOS-specific deep integration for order tracking
 8. **AI ETA Prediction:** Tree-based model (not map-based) for accurate delivery times
 9. **Server-Driven UI:** Kimchi engine enables real-time UI updates without app releases
+10. **Conversational Notifications:** Humor-driven push notifications that feel human
+11. **Group Ordering:** Collaborative cart for up to 50 friends
+12. **Order Scheduling:** Plan deliveries 2 hours to 2 days in advance
 
 ---
 
-## 25. SOURCES & REFERENCES
+## 26. SOURCES & REFERENCES
 
 1. **Zomato Engineering Blog** - "The accurate ETA to customer satisfaction" (Part One, 2022)
 2. **Zomato Blog** - "Sushi Design System" (2019)
@@ -1075,6 +1420,23 @@ TO PAY:                  ₹1,189.82
 13. **PoliMi Repository** - "On-Demand Food Delivery Economic Performance"
 14. **Restoyantra** - "How to Register Your Restaurant on Zomato" (2026)
 15. **Spice Advisors** - "How to Register on Zomato and Swiggy" (2026)
+16. **GrowthX** - "Zomato Business Model & Growth Strategy" (2025)
+17. **Peerlist/0xishika** - "Zomato's UX Breakdown" (2024)
+18. **Financial Express** - "Zomato Group Ordering Feature" (Aug 2024)
+19. **Zomato Blog** - "Order Scheduling Feature" (Oct 2024)
+20. **Verdict Food Service** - "Zomato Order History Deletion" (July 2024)
+21. **Eternal.com** - "Zomato Restaurant Partner App on Large Screens" (2025)
+22. **NextLeap** - "Product Teardown: Zomato's Group Ordering"
+23. **Flipshope** - "How to Cancel Order in Zomato" (2024)
+24. **Mobbin** - "Zomato Android Empty State" (Screen Capture)
+25. **UX Writing Hub** - "Empty State Examples" (2023)
+26. **NNGroup** - "Designing Empty States in Complex Applications" (2021)
+27. **Medium/Muz.li** - "Three Design Practices for Product Engagement" (2017)
+28. **Make It Animated** - "Microinteractions in Mobile Apps" (2026)
+29. **NDLab** - "Animations, Transitions & Microinteractions for Delightful UX" (2025)
+30. **Apptunix** - "7 Features to Add to Your Zomato Clone" (2025)
+31. **ValueAppz** - "Zomato Business Model & Revenue Model" (2023)
+32. **WeAreTenet** - "How to Make an App Like Zomato" (2025)
 
 ---
 
